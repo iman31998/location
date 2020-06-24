@@ -31,7 +31,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         firebase.analytics();
-        const firstVersion = firebase.functions().httpsCallable('locationFunction-firstVersion');
+        const firstVersion = firebase.functions().httpsCallable('userFunction-readLocation');
         firstVersion().then(result => {
             // Read result of the Cloud Function.
             var sanitizedMessage = result.data;
@@ -46,7 +46,7 @@
             var formData = new FormData();
             formData.append('test', 'test');
             // formData.append('licenseImage', document.querySelector('input[type=file]').files[0]);
-            const secondVersion = firebase.functions().httpsCallable('locationFunction-firstVersion');
+            const secondVersion = firebase.functions().httpsCallable('userFunction-readLocation');
             secondVersion({data: JSON.stringify(formData)}).then(result => {
                 // Read result of the Cloud Function.
                 // var sanitizedMessage = result.data;
@@ -56,10 +56,6 @@
 
         }
     </script>
-    <form method="post" enctype="multipart/form-data" onsubmit="onsubmitMethod(event)">
-        git location:
-        <input type="submit" value="git location" name="submit">
-    </form>
 </body>
 
 </html>
