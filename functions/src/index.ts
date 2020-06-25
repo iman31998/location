@@ -20,6 +20,6 @@ main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({ extended: false }));
 
 //initialize the database and the collection 
-exports.userFunction = require('./location/location-controller')
+exports.mapFunction = require('./location/location-controller')
 //define google cloud function name
 export const webApi = functions.https.onRequest(main);
