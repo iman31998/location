@@ -34,13 +34,13 @@ async function readLocation() {
   locationRef.get()
     .then(snapshot => {
       return new Promise((resolve, reject) => {
-        snapshot.forEach(doc => {
+        snapshot.filter(i=>
+           return i.clockIn === true )
+          .forEach(doc => {
           const userData = doc.data();
           var u: user = { id: '', location: { lang: '', lat: '' }, distance: 0 };
-          if (userData.clockIn === true) {
             u = { id: doc.id, location: { lang: userData.location.lang, lat: userData.location.lat }, distance: 0 };
             userInfo.push(u);
-          }
           resolve(userInfo);
           console.log(doc.id, '=>', u.location);
         });
