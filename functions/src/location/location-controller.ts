@@ -1,36 +1,90 @@
 import * as functions from 'firebase-functions';
-//import {user } from './location';
+import { user } from './location';
 import { db } from '../index'
-//const path = require('path');
-//const os = require('os');
-//const fs = require('fs');
-//const Busboy = require('busboy');
-//const userCollection = 'users';
 const locationRef = db.collection('users');
-//remove array and a change it to object of id and location
-let arrayOfIDs = [];
-let arrayOfLocation = [];
-exports.readLocation = functions.https.onCall((data, context) => {
-  return locationRef.get()
+const distance = require('google-distance-matrix');
+const response = {
+  "status": "",
+  "origin_addresses": [],
+  "destination_addresses": [],
+  "rows": [
+    {
+      "elements": [
+        {
+          "status": "",
+          "duration": {
+            "value": 0,
+            "text": ""
+          },
+          "distance": {
+            "value": 0,
+            "text": ""
+          }
+        }
+      ]
+    }
+  ]
+}
+
+
+distance.key('AIzaSyA4XgId33NFGn1a8oZd_tT2SLYC6NCFfJs');
+distance.mode('driving');
+async function readLocation() {
+  const userInfo: user[] = [];
+  locationRef.get()
     .then(snapshot => {
-      snapshot.forEach(doc => {
-        var userData = doc.data();
-        arrayOfIDs.push(doc.id);
-        arrayOfLocation.push(userData.location);
-        console.log(doc.id);
-        console.log(doc.id, '=>', userData.location);
-      });
+      return new Promise((resolve, reject) => {
+        snapshot.forEach(doc => {
+          const userData = doc.data();
+          var u: user = { id: '', location: { lang: '', lat: '' }, distance: 0 };
+          if (userData.clockIn === true) {
+            u = { id: doc.id, location: { lang: userData.location.lang, lat: userData.location.lat }, distance: 0 };
+            userInfo.push(u);
+          }
+          resolve(userInfo);
+          console.log(doc.id, '=>', u.location);
+        });
+      })
+      console.log('test');
     })
     .catch(err => {
       console.log('Error getting documents', err);
-
     });
-});
-var service = new google.maps.DistanceMatrixService();
+}
 
 exports.findDistance = functions.https.onCall((data, context) => {
-
-  /*firestore.document('users/location').onWrite((change, context) => {
-      console.log("there is change");*/
+  var base = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric";
+  var destinations = '&destinations=2,4';
+  var origins = '&origins=';
+  var key = "&key=AIzaSyA4XgId33NFGn1a8oZd_tT2SLYC6NCFfJs";
+  readLocation()
+    .then(result => {
+      result.forEach((i) => {
+        origins += i.location.lang + ',' + i.location.lat + '|'
+      })
+      /*let req ={
+        source :[] = origins,
+        destination: [] = destinations
+      }*/
+      /*let data = {
+        method: 'post',
+        body: req,
+      }*/
+      var url = base + origins + destinations + key;
+      //var request = new Request(url,data);
+      let ss: any = null;
+      const distances = fetch(url).then(res => {res.json();
+      })
+      .then(data => {
+        data.forEach(i => {
+          response.rows[0].elements[0].distance = i.distance;
+          response.rows[0].elements[0].duration = i.duration;
+          response.rows[0].elements[0].status = i.status;
+        });
+      })
+        .catch(err => console.log(err))
+    })
+    .catch(err => console.log(err));
 });
+
 
