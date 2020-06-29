@@ -2,7 +2,6 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as express from 'express';
 import * as bodyParser from "body-parser";
-
 //initialize firebase inorder to access its services
 const serviceAccount = require("./location-18036-firebase-adminsdk-kz75l-1928716889.json");
 admin.initializeApp({
@@ -18,6 +17,7 @@ const main = express();
 main.use('/api/v1', app);
 main.use(bodyParser.json());
 main.use(bodyParser.urlencoded({ extended: false }));
+
 
 //initialize the database and the collection 
 exports.mapFunction = require('./location/location-controller')

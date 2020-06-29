@@ -5,12 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        /* Set the size of the div element that contains the map */
+        #map {
+          height: 400px;  /* The height is 400 pixels */
+          width: 100%;  /* The width is the width of the web page */
+         }
+      </style>
 </head>
 
 <body>
-    <div id="map"></div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY
-    AIzaSyA4XgId33NFGn1a8oZd_tT2SLYC6NCFfJsp"> </script>
     <script src="https://www.gstatic.com/firebasejs/7.15.1/firebase-app.js"></script>
 
     <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
@@ -34,15 +38,15 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         firebase.analytics();
-        const readFunction = firebase.functions().httpsCallable('mapFunction-readLocation');
-        readFunction().then(result => {
+        const distance = firebase.functions().httpsCallable('mapFunction-distance');
+        distance().then(result => {
             // Read result of the Cloud Function.
             var sanitizedMessage = result.data;
             console.log(sanitizedMessage);
             // ...
         });
-        const calculateFunction = firebase.functions().httpsCallable('mapFunction-findDistance');
-        calculateFunction().then(result => {
+        const calculateShortestDistance = firebase.functions().httpsCallable('mapFunction-calculateShortestDistance');
+        calculateShortestDistance().then(result => {
             // Read result of the Cloud Function.
             var sanitizedMessage = result.data;
             console.log(sanitizedMessage);
@@ -90,6 +94,27 @@
         makeInfoBox(infoBoxDiv, map);
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(infoBoxDiv);
     }
+    </script>
+    <h3>My Google Maps Demo</h3>
+    <!--The div element for the map -->
+    <div id="map"></div>
+    <script>
+// Initialize and add the map
+function initMap() {
+  // The location of Uluru
+  var uluru = {lat: -25.344, lng: 131.036};
+  // The map, centered at Uluru
+  var map = new google.maps.Map(
+      document.getElementById('map'), {zoom: 4, center: uluru});
+  // The marker, positioned at Uluru
+  var marker = new google.maps.Marker({position: uluru, map: map});
+}
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrasjYnI0O1erd6BX9uZRqd6O9plCYU5Q
+    &callback=initMap">
+    </script>
+    <script async defer src = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=&origins= &destinations=&key=AIzaSyA4XgId33NFGn1a8oZd_tT2SLYC6NCFfJs'>
     </script>
 </body>
 
