@@ -1,8 +1,8 @@
 export interface user{
     id: string,
     location:{
-    lang:string,
-    lat:string
+        latitude:string,
+        longitude:string
 };
     distance: number
 }
