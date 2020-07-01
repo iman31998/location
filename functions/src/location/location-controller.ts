@@ -12,6 +12,8 @@ const getClockInUsers = () => {
 //calculating the distance for all users 
 exports.calculateShortestDistance = functions.https.onCall((data, context) => {
   let randomUser: user = {id:'',distance:0};
+  const uid  = context.auth?.uid;
+  console.log('uid = ',uid);
   const { lat, long } = data.destination;
   console.log(`lat = ${lat} lng = ${long}`);
   console.log('context',context);
@@ -91,12 +93,16 @@ const distanceMatrixApi = (urlForDistanceMatrixApi: any) => {
 }
 
 exports.distance = functions.https.onCall((data, context) => {
+  console.log('trying things out')
+  const auth  = context.auth;
+  const uid = auth?.uid;
+  console.log('uid = ',uid);
   let randomUser: user = {id:'',distance:0};
   const { lat, long } = data.destination;
   console.log(`lat = ${lat} lng = ${long}`);
   const userInfo: user[] = [];
  // const dist = { lat: 2, lang: 4 }
-  getClockInUsers()
+  const random = getClockInUsers()
     .then((res) => {
       res.forEach((origins) => {
         const { latitude, longitude } = origins.get('location')
@@ -114,12 +120,13 @@ exports.distance = functions.https.onCall((data, context) => {
     console.log('iman',userInfo[index].id);
     randomUser = { id: userInfo[Math.floor(Math.random() * userInfo.length)].id, distance: (Math.random() * 5000) }
     console.log("random user ", randomUser);
+    return randomUser
     })
     .catch((err) => {
       console.log('calculateShortestDistance', err);
     });
     
-  return randomUser;
+  return random;
 })
 
 
