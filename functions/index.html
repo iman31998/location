@@ -8,10 +8,12 @@
     <style>
         /* Set the size of the div element that contains the map */
         #map {
-          height: 400px;  /* The height is 400 pixels */
-          width: 100%;  /* The width is the width of the web page */
-         }
-      </style>
+            height: 400px;
+            /* The height is 400 pixels */
+            width: 100%;
+            /* The width is the width of the web page */
+        }
+    </style>
 </head>
 
 <body>
@@ -28,6 +30,7 @@
         var firebaseConfig = {
             apiKey: "AIzaSyDmhtNXfu5VoENUHWDyi6_h-21i9tszZr0",
             authDomain: "location-18036.firebaseapp.com",
+           // databaseURL: "https://localhost:8080",
             databaseURL: "https://location-18036.firebaseio.com",
             projectId: "location-18036",
             storageBucket: "location-18036.appspot.com",
@@ -39,14 +42,26 @@
         firebase.initializeApp(firebaseConfig);
         firebase.analytics();
         const distance = firebase.functions().httpsCallable('mapFunction-distance');
-        distance().then(result => {
+        distance(
+            {
+            destination: {
+                lat: 31.9040175,
+                long: 35.1953325
+            }
+        }
+        ).then(result => {
             // Read result of the Cloud Function.
             var sanitizedMessage = result.data;
             console.log(sanitizedMessage);
             // ...
         });
         const calculateShortestDistance = firebase.functions().httpsCallable('mapFunction-calculateShortestDistance');
-        calculateShortestDistance().then(result => {
+        calculateShortestDistance({
+            destination: {
+                lat: 31.9040175,
+                long: 35.1953325
+            }
+        }).then(result => {
             // Read result of the Cloud Function.
             var sanitizedMessage = result.data;
             console.log(sanitizedMessage);
@@ -54,14 +69,15 @@
         });
     </script>
     <script>
-
         function onsubmitMethod(el) {
             el.preventDefault();
             var formData = new FormData();
             formData.append('test', 'test');
             // formData.append('licenseImage', document.querySelector('input[type=file]').files[0]);
             const secondVersion = firebase.functions().httpsCallable('userFunction-readLocation');
-            secondVersion({data: JSON.stringify(formData)}).then(result => {
+            secondVersion({
+                data: JSON.stringify(formData)
+            }).then(result => {
                 // Read result of the Cloud Function.
                 // var sanitizedMessage = result.data;
                 console.log(result);
@@ -72,49 +88,66 @@
     </script>
     <script>
         function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 0, lng: 0},
-          zoom: 3,
-          styles: [{
-            featureType: 'poi',
-            stylers: [{ visibility: 'off' }]  // Turn off POI.
-          },
-          {
-            featureType: 'transit.station',
-            stylers: [{ visibility: 'off' }]  // Turn off bus, train stations etc.
-          }],
-          disableDoubleClickZoom: true,
-          streetViewControl: false,
-        });
-    
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: 0,
+                    lng: 0
+                },
+                zoom: 3,
+                styles: [{
+                        featureType: 'poi',
+                        stylers: [{
+                            visibility: 'off'
+                        }] // Turn off POI.
+                    },
+                    {
+                        featureType: 'transit.station',
+                        stylers: [{
+                            visibility: 'off'
+                        }] // Turn off bus, train stations etc.
+                    }
+                ],
+                disableDoubleClickZoom: true,
+                streetViewControl: false,
+            });
 
-        // Create the DIV to hold the control and call the makeInfoBox() constructor
-        // passing in this DIV.
-        var infoBoxDiv = document.createElement('div');
-        makeInfoBox(infoBoxDiv, map);
-        map.controls[google.maps.ControlPosition.TOP_CENTER].push(infoBoxDiv);
-    }
+
+            // Create the DIV to hold the control and call the makeInfoBox() constructor
+            // passing in this DIV.
+            var infoBoxDiv = document.createElement('div');
+            makeInfoBox(infoBoxDiv, map);
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(infoBoxDiv);
+        }
     </script>
     <h3>My Google Maps Demo</h3>
     <!--The div element for the map -->
     <div id="map"></div>
     <script>
-// Initialize and add the map
-function initMap() {
-  // The location of Uluru
-  var uluru = {lat: -25.344, lng: 131.036};
-  // The map, centered at Uluru
-  var map = new google.maps.Map(
-      document.getElementById('map'), {zoom: 4, center: uluru});
-  // The marker, positioned at Uluru
-  var marker = new google.maps.Marker({position: uluru, map: map});
-}
+        // Initialize and add the map
+        function initMap() {
+            // The location of Uluru
+            var uluru = {
+                lat: -25.344,
+                lng: 131.036
+            };
+            // The map, centered at Uluru
+            var map = new google.maps.Map(
+                document.getElementById('map'), {
+                    zoom: 4,
+                    center: uluru
+                });
+            // The marker, positioned at Uluru
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+        }
     </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrasjYnI0O1erd6BX9uZRqd6O9plCYU5Q
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBrasjYnI0O1erd6BX9uZRqd6O9plCYU5Q
     &callback=initMap">
     </script>
-    <script async defer src = 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=&origins= &destinations=&key=AIzaSyA4XgId33NFGn1a8oZd_tT2SLYC6NCFfJs'>
+    <script async defer
+        src='https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=&origins= &destinations=&key=AIzaSyA4XgId33NFGn1a8oZd_tT2SLYC6NCFfJs'>
     </script>
 </body>
 
